@@ -7,10 +7,19 @@ import {
   signOut,
   onAuthStateChanged
  } from "firebase/auth";
+ import { collection, addDoc} from "firebase/firestore";
 
 function App() {
   const [user, setUser] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+
+  function createPost() {
+    const post = {
+      title: "Land a 1m job",
+      description: "Finish Frontend Simplified",
+    };
+    addDoc(collection(db, "posts"), post)
+  }
 
 React.useEffect(() => {
   onAuthStateChanged(auth, (user ) => {
@@ -56,6 +65,7 @@ signInWithEmailAndPassword(auth, '2email@email.com', 'test123')
       <button onClick={login}>Login</button>
       <button onClick={logout}>Logout</button>
       {loading ? 'Loading...' : user.email}
+      <button onClick={createPost}>Create Post</button>
     </div>
   );
 }
