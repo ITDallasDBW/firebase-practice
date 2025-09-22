@@ -9,6 +9,7 @@ import {
   doc,
   query,
   where,
+  updateDoc,
 } from "firebase/firestore";
 import {
   createUserWithEmailAndPassword,
@@ -20,6 +21,26 @@ import {
 function App() {
   const [user, setUser] = React.useState({});
   const [loading, setLoading] = React.useState(true);
+
+  async function updatePost() {
+    const hardcodedId = "NaqfMp8s4t79tfyGUm6Z";
+    const postRef = doc(db, "posts", hardcodedId);
+    const post = await getPostById(hardcodedId);
+    console.log(post);
+    const newPost = {
+      ...post,
+      title: "land a $400k job"
+    };
+    console.log(newPost);
+    updateDoc(postRef, newPost); 
+
+    // const newPost = {
+    //   description: "FInish Frontend Simplified",
+    //   uid: "1",
+    //   title: "land a 300k job"
+    // };
+    // updateDoc(postRef, newPost); 
+  }
 
   function createPost() {
     const post = {
@@ -36,23 +57,29 @@ function App() {
     console.log(posts);
   }
 
-  async function getPostById() {
-    const hardcodedId = "NaqfMp8s4t79tfyGUm6Z";
-    const postRef = doc(db, "posts", hardcodedId);
+  // async function getPostById() {
+  //   const hardcodedId = "NaqfMp8s4t79tfyGUm6Z";
+  //   const postRef = doc(db, "posts", hardcodedId);
+  //   const postSnap = await getDoc(postRef);
+  //   const post = postSnap.data();
+  //   console.log(post);
+  // }
+  //Instead of above, better practice is:
+  async function getPostById(id) {
+    const postRef = doc(db, "posts", id);
     const postSnap = await getDoc(postRef);
-    const post = postSnap.data();
-    console.log(post);
+    return postSnap.data();
+    // console.log(post);
   }
 
-
-async function getPostByUid() {
-  const postCollectionRef = await query(
-    collection(db, "posts"),
-    where("uid", "==", user.uid)
-  );
-  const {docs} = await getDocs(postCollectionRef);
-  console.log(docs.map(doc => doc.data( )));
-}
+  async function getPostByUid() {
+    const postCollectionRef = await query(
+      collection(db, "posts"),
+      where("uid", "==", user.uid)
+    );
+    const { docs } = await getDocs(postCollectionRef);
+    console.log(docs.map((doc) => doc.data()));
+  }
 
   // async function getPostByUid() {
   //   const postCollectionRef = await query(
@@ -110,6 +137,7 @@ async function getPostByUid() {
       <button onClick={getAllPosts}>Get All Posts</button>
       <button onClick={getPostById}>Get Post By Id</button>
       <button onClick={getPostByUid}>Get Post By Uid</button>
+      <button onClick={updatePost}>Update Post</button>
     </div>
   );
 }
